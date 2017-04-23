@@ -5,7 +5,6 @@ import { List, ListItem, Icon } from 'react-native-elements'
 
 import { initializeMeteorOffline } from './react-native-meteor-offline';
 
-Meteor.connect('ws://192.168.1.2:3000/websocket');
 const store = initializeMeteorOffline({ log: true });
 const ADDED = 'ddp/added';
 
@@ -27,6 +26,7 @@ const data = [
 class RNDemo extends Component {
   addItem = () => {
     const item = data[Math.floor(Math.random() * data.length)];
+    // Use insert instead of method call to get Optimastic UI updates and to work when offline. (Currently, react-native-meteor does not support Optimistic UI updates with method calling)
     const newItemID = Meteor.collection('links').insert({ title: item.title, url: item.url, createdAt: new Date() }, function (err, res) {
       if (err) {
         console.log('Insert error', err);
@@ -36,7 +36,8 @@ class RNDemo extends Component {
       }
     });
     if(!Meteor.status().connected){
-      const payload = { collection: "links", fields: { createdAt: new Date(), title: item.title, url: item.url }, id: newItemID };
+      // If Offline dispatch action to create item in store with offline flag
+      const payload = { collection: "links", fields: { createdAt: new Date(), title: item.title, url: item.url, offline: true }, id: newItemID };
       store.dispatch({ type: ADDED, payload });
     }
   };
