@@ -5,7 +5,7 @@ import { List, ListItem, Icon } from 'react-native-elements'
 
 import { initializeMeteorOffline } from './react-native-meteor-offline';
 
-Meteor.connect('ws://localhost:3000/websocket');
+Meteor.connect('ws://192.168.1.2:3000/websocket');
 initializeMeteorOffline({ log: true });
 
 const data = [
