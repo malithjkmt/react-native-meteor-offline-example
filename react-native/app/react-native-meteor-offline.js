@@ -78,7 +78,16 @@ const onRehydration = (store) => {
         return doc;
       });
 
-      db[collectionName].upsert(collectionArr);
+      for (i = 0; i < collectionArr.length; i++) {
+        Meteor.collection(collectionName).insert(collectionArr[i], function (err, res) {
+          if (err) {
+            console.log('Insert error', err);
+          }
+          else {
+            console.log('insert success: ', res);
+          }
+        });
+      }
     });
   }
 };
