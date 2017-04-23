@@ -26,9 +26,12 @@ const data = [
 class RNDemo extends Component {
   addItem = () => {
     const item = data[Math.floor(Math.random() * data.length)];
-    Meteor.call('links.insert', item.title, item.url, (error) => {
-      if (error) {
-        console.log('Insert error', error.error);
+    Meteor.collection('links').insert({ title: item.title, url: item.url, createdAt: new Date() }, function (err, res) {
+      if (err) {
+        console.log('Insert error', err);
+      }
+      else {
+        console.log('insert success: ', res);
       }
     });
   };
