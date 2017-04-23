@@ -103,4 +103,5 @@ export const initializeMeteorOffline = (opts = {}) => {
   Meteor.ddp.on('removed', (payload) => {
     store.dispatch({ type: REMOVED, payload });
   });
+  return store;
 };

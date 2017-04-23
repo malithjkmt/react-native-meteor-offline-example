@@ -6,7 +6,8 @@ import { List, ListItem, Icon } from 'react-native-elements'
 import { initializeMeteorOffline } from './react-native-meteor-offline';
 
 Meteor.connect('ws://192.168.1.2:3000/websocket');
-initializeMeteorOffline({ log: true });
+const store = initializeMeteorOffline({ log: true });
+const ADDED = 'ddp/added';
 
 const data = [
   {
@@ -26,7 +27,7 @@ const data = [
 class RNDemo extends Component {
   addItem = () => {
     const item = data[Math.floor(Math.random() * data.length)];
-    Meteor.collection('links').insert({ title: item.title, url: item.url, createdAt: new Date() }, function (err, res) {
+    const newItemID = Meteor.collection('links').insert({ title: item.title, url: item.url, createdAt: new Date() }, function (err, res) {
       if (err) {
         console.log('Insert error', err);
       }
@@ -34,6 +35,10 @@ class RNDemo extends Component {
         console.log('insert success: ', res);
       }
     });
+    if(!Meteor.status().connected){
+      const payload = { collection: "links", fields: { createdAt: new Date(), title: item.title, url: item.url }, id: newItemID };
+      store.dispatch({ type: ADDED, payload });
+    }
   };
 
   pressItem = (url) => {
