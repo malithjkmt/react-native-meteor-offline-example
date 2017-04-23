@@ -84,7 +84,7 @@ const onRehydration = (store) => {
 };
 
 export const initializeMeteorOffline = (opts = {}) => {
-  const logger = createLogger({ predicate: () => opts.log || false });
+  const logger = createLogger({  diff: true, collapsed: true, predicate: () => opts.log || false });
   const store = createStore(reducer, applyMiddleware(logger), autoRehydrate());
   persistStore(store, {
     storage: AsyncStorage,
