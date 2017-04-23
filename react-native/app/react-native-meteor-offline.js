@@ -14,7 +14,6 @@ const REMOVED = 'ddp/removed';
 // Reducer
 const reducer = (state = {}, action) => {
   const { collection, id, fields } = action.payload || {};
-
   switch (action.type) {
     case ADDED:
       if (!state[collection]) {
@@ -77,9 +76,13 @@ const onRehydration = (store) => {
         doc._id = _id;
         return doc;
       });
-
+        console.log(db['links'].items);
       for (i = 0; i < collectionArr.length; i++) {
-        Meteor.collection(collectionName).insert(collectionArr[i], function (err, res) {
+
+        // If the item was made offline insert to both minimongo and server 
+        if(collectionArr[i].offline){
+          console.log('item: ', collectionArr[i]);
+          Meteor.collection(collectionName).insert(collectionArr[i], function (err, res) {
           if (err) {
             console.log('Insert error', err);
           }
@@ -88,11 +91,18 @@ const onRehydration = (store) => {
           }
         });
       }
+      else{
+        // db[collectionName].upsert(collectionArr);
+         db[collectionName].upsert(collectionArr[i])
+         console.log('updated data ', collectionArr[i]);
+      }
+      }
     });
   }
 };
 
 export const initializeMeteorOffline = (opts = {}) => {
+  Meteor.connect('ws://192.168.43.58:3000/websocket');
   const logger = createLogger({  diff: true, collapsed: true, predicate: () => opts.log || false });
   const store = createStore(reducer, applyMiddleware(logger), autoRehydrate());
   persistStore(store, {
